@@ -1,0 +1,35 @@
+.container {
+    display: flex;
+}
+
+.view-box {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid gray;
+    margin: 1%;
+}
+
+.mat-toolbar {
+    position: relative;
+}
+
+.input {
+    padding: 0 1%;
+    font-size: 1rem;
+    background-color: rgb(211, 249, 216);
+    border-radius: 7%;
+    border: 0.1px solid rgb(216, 211, 211);
+    width: 15%;
+    position: absolute;
+    right: 2%;
+
+}
+
+.sorting {
+    color: rgb(7, 7, 163);
+    font-size: 0.9rem;
+    width: 11%;
+    margin-bottom: 2%;
+    height: 75%;
+    overflow: hidden;
+}
