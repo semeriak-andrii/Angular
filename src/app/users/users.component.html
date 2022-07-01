@@ -4,24 +4,32 @@
 
 <mat-toolbar>
     <button mat-button color="primary" (click)="onSelectAllClick()">Select all</button>
-    <button mat-button color="primary" [disabled]="dasabled()" (click)="onDeleteClick()">Delete</button>
+    <button mat-button color="primary" [disabled]="!enabled()" (click)="onDeleteClick()">Delete</button>
     <mat-form-field appearance="fill" class="sorting">
-        <option label="Sorting users" ></option>
+        <option label="Sorting users"></option>
         <mat-select (selectionChange)="onSortSelect($event)">
-        <mat-option [value]="option" *ngFor="let option of sortOptions">{{ option }}</mat-option>
-    </mat-select>
-</mat-form-field>
-    <input matInput [(ngModel)]="searchInput" (keyup)="onSearch()" placeholder="Search users" class="input"/>
+            <mat-option [value]="option" *ngFor="let option of sortOptions">{{ option }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <input matInput [(ngModel)]="searchInput" (keyup)="onSearch()" placeholder="Search users" class="input" />
 </mat-toolbar>
+<form (ngSubmit)="onAddUserClick()" #form="ngForm">
+    <input type="text" required minlength="2" [(ngModel)]="firstNameUser" name="firstNameUser" placeholder="first name" class="form" />
+    <input type="text" required minlength="2" maxlength="60" [(ngModel)]="lastNameUser" name="lastNameUser" placeholder="last name" class="form" />
+    <input type="email" email [(ngModel)]="emailUser" name="emailUser" placeholder="email" class="form" />
+    <input type="number" required [(ngModel)]="phoneUser" name="phoneUser" placeholder="phone" class="form" />
+    <button [disabled]="!form.valid" type="submit" mat-button color="primary" >Add</button>
+</form>
+<div *ngIf="isDeleting">DELETING!</div>
 
 <div *ngIf="users.length" class="container">
-    <mat-card *ngFor="let user of users" class="view-box">
+    <mat-card *ngFor="let user of users; let i = index" class="view-box">
 
         <mat-card-title>
-            {{ user.firstname }} {{ user.lastname }}
+            {{ user.name }} <br> {{user.username}}
             <mat-checkbox class="user-checkbox" [(ngModel)]="user.isSelected"></mat-checkbox>
         </mat-card-title>
-       <p>{{ user.email }}</p>
+        <p>{{ user.email }}</p>
         <p>{{ user.phone }}</p>
     </mat-card>
 </div>

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
+import { firstValueFrom } from 'rxjs';
 import { User } from './user';
+import { UsersApiService } from './users-api.service';
 import { UsersService } from './users.service';
-
+import { NgForm } from '@angular/forms';
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
@@ -10,7 +12,7 @@ import { UsersService } from './users.service';
 })
 export class UsersComponent implements OnInit {
 
-  sortOptions = ['firstname', 'lastname'];
+  sortOptions = ['name', 'username'];
 
   users: User[] = [];
 
@@ -22,16 +24,26 @@ export class UsersComponent implements OnInit {
 
   searchInput = '';
 
-  constructor(private usersService: UsersService) { }
+  isDeleting = false;
+  firstNameUser: string | undefined;
+  lastNameUser: string | undefined;
+  phoneUser: string | undefined;
+  emailUser: string | undefined;
+
+  constructor(
+    private usersService: UsersService,
+    private usersApiService: UsersApiService
+  ) { }
 
   ngOnInit(): void {
-    this.users = this.usersService.getMockedUsers();
-    this.initialUsers = this.usersService.getMockedUsers();
+    this.usersApiService.getUsers().subscribe(users => {
+      this.users = users;
+      this.initialUsers = users;
+    });
   }
 
-  dasabled(): boolean {
-    this.users.forEach(user => { if (user.isSelected) { this.disabled = false } });
-    return this.disabled
+  enabled(): boolean {
+    return this.users.some(user => user.isSelected);
   }
 
   onSelectAllClick(): void {
@@ -40,7 +52,15 @@ export class UsersComponent implements OnInit {
   }
 
   onDeleteClick(): void {
-    this.users = this.users.filter(user => !user.isSelected);
+    const selectedIndexes: any[] = [];
+    this.users.forEach((user, index) => {
+      if (user.isSelected) {
+        selectedIndexes.push(index);
+      }
+    });
+    Promise.all(selectedIndexes.map(index => firstValueFrom(this.usersApiService.deleteUser(this.users[index].id)))).then(() => {
+      selectedIndexes.reverse().forEach(index => this.users.splice(index, 1));
+    })
   }
 
   onSortSelect(event: MatSelectChange): void {
@@ -51,6 +71,29 @@ export class UsersComponent implements OnInit {
   onSearch(): void {
     this.users = this.initialUsers.filter(user => {
       return Object.keys(user).some(key => `${user[key as keyof User]}`.toLowerCase().includes(this.searchInput));
+    });
+  }
+
+  onAddUserClick(): void {
+    this.usersApiService.addUser({
+      name: this.firstNameUser,
+      username: this.lastNameUser,
+      phone: this.phoneUser,
+      email: this.emailUser
+    }).subscribe(newUser => {
+      this.users.push(newUser);
+    });
+    this.firstNameUser=''
+    this.lastNameUser =''
+    this.phoneUser =''
+    this.emailUser =''
+  }
+
+  onDeleteUserClick(id: number, i: number): void {
+    this.isDeleting = true;
+    this.usersApiService.deleteUser(id).subscribe(res => {
+      this.users.splice(i, 1);
+      this.isDeleting = false;
     });
   }
 }

@@ -9,6 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { UsersApiService } from './users-api.service';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { FormsModule } from '@angular/forms';
     MatSelectModule
   ],
   providers: [
-    UsersService
+    UsersService,
+    UsersApiService
   ],
   exports: [
     UsersComponent
